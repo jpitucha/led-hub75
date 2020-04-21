@@ -17,117 +17,106 @@
 byte vRamR[4][64] = {0};
 byte vRamG[4][64] = {0};
 byte vRamB[4][64] = {0};
+byte currentRow = 0;
 
-void selectLine1_17() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, LOW);
-  digitalWrite(C, LOW);
-  digitalWrite(D, LOW);
-}
-
-void selectLine2_18() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, LOW);
-  digitalWrite(C, LOW);
-  digitalWrite(D, LOW);
-}
-
-void selectLine3_19() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, LOW);
-  digitalWrite(D, LOW);
-}
-
-void selectLine4_20() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, LOW);
-  digitalWrite(D, LOW);
-}
-
-void selectLine5_21() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, LOW);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, LOW);
-}
-
-void selectLine6_22() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, LOW);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, LOW);
-}
-
-void selectLine7_23() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, LOW);
-}
-
-void selectLine8_24() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, LOW);
-}
-
-void selectLine9_25() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, LOW);
-  digitalWrite(C, LOW);
-  digitalWrite(D, HIGH);
-}
-
-void selectLine10_26() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, LOW);
-  digitalWrite(C, LOW);
-  digitalWrite(D, HIGH);
-}
-
-void selectLine11_27() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, LOW);
-  digitalWrite(D, HIGH);
-}
-
-void selectLine12_28() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, LOW);
-  digitalWrite(D, HIGH);
-}
-
-void selectLine13_29() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, LOW);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, HIGH);
-}
-
-void selectLine14_30() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, LOW);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, HIGH);
-}
-
-void selectLine15_31() {
-  digitalWrite(A, LOW);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, HIGH);
-}
-
-void selectLine16_32() {
-  digitalWrite(A, HIGH);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, HIGH);
-  digitalWrite(D, HIGH);
+void nextRow() {
+  if (currentRow == 0) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    currentRow = 1;
+  } else if (currentRow == 1) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    currentRow = 2;
+  } else if (currentRow == 2) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    currentRow = 3;
+  } else if (currentRow == 3) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    currentRow = 4;
+  } else if (currentRow == 4) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, LOW);
+    currentRow = 5;
+  } else if (currentRow == 5) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, LOW);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, LOW);
+    currentRow = 6;
+  } else if (currentRow == 6) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, LOW);
+    currentRow = 7;
+  } else if (currentRow == 7) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, LOW);
+    currentRow = 8;
+  } else if (currentRow == 8) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, HIGH);
+    currentRow = 9;
+  } else if (currentRow == 9) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, HIGH);
+    currentRow = 10;
+  } else if (currentRow == 10) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, LOW);
+    digitalWrite(D, HIGH);
+    currentRow = 11;
+  } else if (currentRow == 11) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, LOW);
+    digitalWrite(D, HIGH);
+    currentRow = 12;
+  } else if (currentRow == 12) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, HIGH);
+    currentRow = 13;
+  } else if (currentRow == 13) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, LOW);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, HIGH);
+    currentRow = 14;
+  } else if (currentRow == 14) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, HIGH);
+    currentRow = 15;
+  } else if (currentRow = 15) {
+    digitalWrite(A, HIGH);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, HIGH);
+    digitalWrite(D, HIGH);
+    currentRow = 0;
+  }
 }
 
 void clkTick() {
@@ -148,6 +137,9 @@ void disableOutput() {
   digitalWrite(OE, HIGH);
 }
 
+void shiftInData() {
+  
+}
 
 void setup() {
   pinMode(A, OUTPUT);
@@ -163,13 +155,18 @@ void setup() {
   pinMode(CLK, OUTPUT);
   pinMode(LATCH, OUTPUT);
   pinMode(OE, OUTPUT);
+
+  for (int i = 0; i < 64; i++) {
+    clkTick();
+    latchTick();
+  }
 }
 
 void loop() {
-  selectLine1_17();
   enableOutput();
-  //set data
+  shiftInData();
   latchTick();
+  nextRow();
   disableOutput();
   delayMicroseconds(BLANK_DELAY_TIME_US);  
 }
