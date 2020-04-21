@@ -136,17 +136,44 @@ def enableOutput():
 def disableOutput():
     OE.on()
 
-#def shiftInData():
+def shiftInData():
+    for i in range(64):
+        if (isBitSet(vramR[0][64 - i], i)):
+            R1.on()
+        else:
+            R1.off()
+        if (isBitSet(vramR[1][64 - i], i)):
+            R2.on()
+        else:
+            R2.off()
+
+        if (isBitSet(vramG[0][64 - i], i)):
+            G1.on()
+        else:
+            G1.off()
+        if (isBitSet(vramG[1][64 - i], i)):
+            G2.on()
+        else:
+            G2.off()
+
+        if (isBitSet(vramB[0][64 - i], i)):
+            B1.on()
+        else:
+            B1.off()
+        if (isBitSet(vramB[1][64 - i], i)):
+            B2.on()
+        else:
+            B2.off()
+
+        clkTick()
 
 def isBitSet(value, position):
     return value & (1 << position)
 
-
 while True:
     enableOutput()
-    # setData
-    nextRow()
-    clkTick()
+    shiftInData()
     latchTick()
+    nextRow()
     disableOutput()
     sleep(BLANK_DELAY_TIME_US / 1000000)
