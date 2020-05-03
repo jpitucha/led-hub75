@@ -1,18 +1,26 @@
-#define A 2
-#define B 3
-#define C 4
-#define D 5
-#define R1 A0
-#define R2 A1
-#define G1 A2
-#define G2 A3
-#define B1 A4
-#define B2 A5
-#define CLK 8
-#define LATCH 9
-#define OE 10
+/**
+ * P4-64x32
+ * 
+ * CONNECTION SCHEMA
+ * A - 2
+ * B - 3
+ * C - 4
+ * D - 5
+ * CLK - 8
+ * LATCH - 9
+ * OE - 10
+ * R1 - A0
+ * R2 - A1
+ * G1 - A2
+ * G2 - A3
+ * B1 - A4
+ * B2 - A5
+ * 
+ * PORT D reserved only for ABCD
+**/
 
-#define BLANK_DELAY_TIME_US 5000
+#define HOLD_DELAY_TIME_US 199
+#define BLANK_DELAY_TIME_US 1
 
 byte vRamR[4][64] = {0};
 byte vRamG[4][64] = {0};
@@ -21,152 +29,171 @@ byte currentRow = 0;
 
 void nextRow() {
   if (currentRow == 0) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, LOW);
-    digitalWrite(C, LOW);
-    digitalWrite(D, LOW);
+    PORTD = 0b00111100;
     currentRow = 1;
   } else if (currentRow == 1) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, LOW);
-    digitalWrite(C, LOW);
-    digitalWrite(D, LOW);
+    PORTD = 0b00111000;
     currentRow = 2;
   } else if (currentRow == 2) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, LOW);
-    digitalWrite(D, LOW);
+    PORTD = 0b00110100;
     currentRow = 3;
   } else if (currentRow == 3) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, LOW);
-    digitalWrite(D, LOW);
+    PORTD = 0b00110000;
     currentRow = 4;
   } else if (currentRow == 4) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, LOW);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, LOW);
+    PORTD = 0b00101100;
     currentRow = 5;
   } else if (currentRow == 5) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, LOW);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, LOW);
+    PORTD = 0b00101000;
     currentRow = 6;
   } else if (currentRow == 6) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, LOW);
+    PORTD = 0b00100100;
     currentRow = 7;
   } else if (currentRow == 7) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, LOW);
+    PORTD = 0b00100000;
     currentRow = 8;
   } else if (currentRow == 8) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, LOW);
-    digitalWrite(C, LOW);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00011100;
     currentRow = 9;
   } else if (currentRow == 9) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, LOW);
-    digitalWrite(C, LOW);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00011000;
     currentRow = 10;
   } else if (currentRow == 10) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, LOW);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00010100;
     currentRow = 11;
   } else if (currentRow == 11) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, LOW);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00010000;
     currentRow = 12;
   } else if (currentRow == 12) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, LOW);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00001100;
     currentRow = 13;
   } else if (currentRow == 13) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, LOW);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00001000;
     currentRow = 14;
   } else if (currentRow == 14) {
-    digitalWrite(A, LOW);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00000100;
     currentRow = 15;
   } else if (currentRow = 15) {
-    digitalWrite(A, HIGH);
-    digitalWrite(B, HIGH);
-    digitalWrite(C, HIGH);
-    digitalWrite(D, HIGH);
+    PORTD = 0b00000000;
     currentRow = 0;
   }
 }
 
-void clkTick() {
-  digitalWrite(CLK, HIGH);
-  digitalWrite(CLK, LOW);
-}
-
-void latchTick() {
-  digitalWrite(LATCH, HIGH);
-  digitalWrite(LATCH, LOW);
-}
-
-void enableOutput() {
-  digitalWrite(OE, LOW);
-}
-
-void disableOutput() {
-  digitalWrite(OE, HIGH);
-}
-
+void clkTick() { PORTB |= 1; PORTB &= ~1; }
+void latchTick() { PORTB |= (1 << 1); PORTB &= ~(1 << 1); }
+void enableOutput() { PORTB &= ~(1 << 2); }
+void disableOutput() { PORTB |= (1 << 2); }
 void shiftInData() {
-  
-}
+  if (currentRow < 8) {
+    for (int i = 0; i < 64; i++) {
+      if (bitRead(vRamR[0][63 - i], currentRow % 8)) PORTC |= 0b00000010; else PORTC &= ~0b00000010;
+      if (bitRead(vRamG[0][63 - i], currentRow % 8)) PORTC |= 0b00001000; else PORTC &= ~0b00001000;
+      if (bitRead(vRamB[0][63 - i], currentRow % 8)) PORTC |= 0b00100000; else PORTC &= ~0b00100000;
 
-void setup() {
-  pinMode(A, OUTPUT);
-  pinMode(B, OUTPUT);
-  pinMode(C, OUTPUT);
-  pinMode(D, OUTPUT);
-  pinMode(R1, OUTPUT);
-  pinMode(R2, OUTPUT);
-  pinMode(G1, OUTPUT);
-  pinMode(G2, OUTPUT);
-  pinMode(B1, OUTPUT);
-  pinMode(B2, OUTPUT);
-  pinMode(CLK, OUTPUT);
-  pinMode(LATCH, OUTPUT);
-  pinMode(OE, OUTPUT);
+      if (bitRead(vRamG[2][63 - i], currentRow % 8)) PORTC |= 0b00000001; else PORTC &= ~0b00000001;
+      if (bitRead(vRamG[2][63 - i], currentRow % 8)) PORTC |= 0b00000100; else PORTC &= ~0b00000100;
+      if (bitRead(vRamB[2][63 - i], currentRow % 8)) PORTC |= 0b00010000; else PORTC &= ~0b00010000;
 
-  for (int i = 0; i < 64; i++) {
-    clkTick();
-    latchTick();
+      clkTick();
+    }
+  } else {
+    for (int i = 0; i < 64; i++) {
+      if (bitRead(vRamR[1][63 - i], currentRow % 8)) PORTC |= 0b00000010; else PORTC &= ~0b00000010;
+      if (bitRead(vRamG[1][63 - i], currentRow % 8)) PORTC |= 0b00001000; else PORTC &= ~0b00001000;
+      if (bitRead(vRamB[1][63 - i], currentRow % 8)) PORTC |= 0b00100000; else PORTC &= ~0b00100000;
+
+      if (bitRead(vRamG[3][63 - i], currentRow % 8)) PORTC |= 0b00000001; else PORTC &= ~0b00000001;
+      if (bitRead(vRamG[3][63 - i], currentRow % 8)) PORTC |= 0b00000100; else PORTC &= ~0b00000100;
+      if (bitRead(vRamB[3][63 - i], currentRow % 8)) PORTC |= 0b00010000; else PORTC &= ~0b00010000;
+
+      clkTick();
+    }
   }
 }
 
-void loop() {
+void setup() {
+  DDRB |= 0b00000111; //Clk's
+  DDRC |= 0b00111111; //Data
+  DDRD |= 0b00111100; //ABCD
+
+  vRamG[0][0] = 126;
+  vRamG[0][1] = 129;
+  vRamG[0][2] = 189;
+  vRamG[0][3] = 165;
+  vRamG[0][4] = 165;
+  vRamG[0][5] = 189;
+  vRamG[0][6] = 161;
+  vRamG[0][7] = 30;
+  
+  vRamG[0][9] = 126;
+  vRamG[0][10] = 129;
+  vRamG[0][11] = 129;
+  vRamG[0][12] = 126;
+  
+  vRamG[0][14] = 255;
+  vRamG[0][15] = 137;
+  vRamG[0][16] = 137; 
+  vRamG[0][17] = 118;
+  
+  vRamG[0][19] = 143;
+  vRamG[0][20] = 137;
+  vRamG[0][21] = 137;
+  vRamG[0][22] = 249;
+  
+  vRamG[0][24] = 255;
+  vRamG[0][25] = 129;
+  vRamG[0][26] = 129;
+  vRamG[0][27] = 129;
+  
+  vRamG[0][29] = 255;
+  vRamG[0][30] = 137;
+  vRamG[0][31] = 137;
+  vRamG[0][32] = 137;
+  
+  vRamG[0][34] = 255;
+  vRamG[0][35] = 2;
+  vRamG[0][36] = 60;
+  vRamG[0][37] = 64;
+  vRamG[0][38] = 255;
+  
+  vRamG[0][40] = 255;
+  
+  vRamG[0][42] = 126;
+  vRamG[0][43] = 129;
+  vRamG[0][44] = 129;
+  vRamG[0][45] = 129;
+
+  vRamG[0][47] = 193;
+  vRamG[0][48] = 161;
+  vRamG[0][49] = 153;
+  vRamG[0][50] = 133;
+  vRamG[0][51] = 131;
+  
+  vRamG[0][53] = 255;
+  vRamG[0][54] = 2;
+  vRamG[0][55] = 60;
+  vRamG[0][56] = 64;
+  vRamG[0][57] = 255;
+
+  vRamG[0][59] = 1;
+  vRamG[0][60] = 2;
+  vRamG[0][61] = 252;
+  vRamG[0][62] = 2;
+  vRamG[0][63] = 1;
+  
+  //pre-clearing the display
+  disableOutput();
+  for (int i = 0; i < 64; i++) clkTick();
+  latchTick();
   enableOutput();
+}
+
+void loop() {
   shiftInData();
   latchTick();
   nextRow();
+  enableOutput();
+  delayMicroseconds(HOLD_DELAY_TIME_US);
   disableOutput();
   delayMicroseconds(BLANK_DELAY_TIME_US);  
 }
